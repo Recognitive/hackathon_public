@@ -60,6 +60,6 @@ fizzBtn.addEventListener("click", () => {
 });
 wordleBtn.addEventListener("click", () => {
   argvEl.value = "wordle play";
-  stdinEl.value = "train\ncrane\n";
+  stdinEl.value = "train\nbrain\n";
   selectSample("wordle");
 });
