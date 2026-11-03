@@ -37,7 +37,7 @@ function inodeFromJson(node) {
 }
 
 // Replaced at publish time so Pages/CDN caches cannot serve a stale FS after a secret change.
-const BUILD_ID = "20261103004829";
+const BUILD_ID = "20261103010905";
 
 async function loadAssets(baseUrl) {
   const base = baseUrl.endsWith("/") ? baseUrl : baseUrl + "/";
