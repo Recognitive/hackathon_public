@@ -71,6 +71,16 @@ textarea {
   margin-bottom: 1.25rem;
 }
 
+.actions.samples {
+  margin-bottom: 1.5rem;
+}
+
+button.ghost.selected {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(11, 110, 79, 0.08);
+}
+
 button {
   font: 600 0.95rem/1 var(--sans);
   padding: 0.7rem 1.1rem;

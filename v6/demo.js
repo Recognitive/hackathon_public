@@ -44,12 +44,22 @@ async function run() {
   }
 }
 
+const fizzBtn = document.getElementById("sample-fizz");
+const wordleBtn = document.getElementById("sample-wordle");
+
+function selectSample(which) {
+  fizzBtn.classList.toggle("selected", which === "fizz");
+  wordleBtn.classList.toggle("selected", which === "wordle");
+}
+
 document.getElementById("run").addEventListener("click", run);
-document.getElementById("sample-fizz").addEventListener("click", () => {
+fizzBtn.addEventListener("click", () => {
   argvEl.value = FIZZ_SECTIONS;
   stdinEl.value = "";
+  selectSample("fizz");
 });
-document.getElementById("sample-wordle").addEventListener("click", () => {
+wordleBtn.addEventListener("click", () => {
   argvEl.value = "wordle play";
   stdinEl.value = "train\ncrane\n";
+  selectSample("wordle");
 });
