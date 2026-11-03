@@ -36,11 +36,15 @@ function inodeFromJson(node) {
   return new Directory(kids);
 }
 
+// Replaced at publish time so Pages/CDN caches cannot serve a stale FS after a secret change.
+const BUILD_ID = "20261103004829";
+
 async function loadAssets(baseUrl) {
   const base = baseUrl.endsWith("/") ? baseUrl : baseUrl + "/";
+  const q = `?v=${encodeURIComponent(BUILD_ID)}`;
   const [wasmRes, rootRes] = await Promise.all([
-    fetch(new URL("lapis.wasm", base)),
-    fetch(new URL("root.json", base)),
+    fetch(new URL("lapis.wasm" + q, base)),
+    fetch(new URL("root.json" + q, base)),
   ]);
   if (!wasmRes.ok) throw new Error(`failed to fetch lapis.wasm: ${wasmRes.status}`);
   if (!rootRes.ok) throw new Error(`failed to fetch root.json: ${rootRes.status}`);
