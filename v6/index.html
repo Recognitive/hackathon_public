@@ -1,3 +1,41 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="utf-8" /><title>Lapis v6</title></head>
-<body><p>Run <code>make browser-public</code> from the private hackathon/v6 tree.</p></body></html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lapis v6 — browser</title>
+  <link rel="stylesheet" href="./demo.css" />
+  <script type="importmap">
+  {
+    "imports": {
+      "@bjorn3/browser_wasi_shim": "./vendor/browser_wasi_shim/index.js"
+    }
+  }
+  </script>
+</head>
+<body>
+  <main>
+    <h1>Lapis</h1>
+    <p class="lede">FizzBuzz and Wordle on the bundled WebAssembly host. Wordle guesses go through stdin.</p>
+
+    <label class="field">
+      <span>argv</span>
+      <textarea id="argv" rows="3" spellcheck="false">fizzbuzz fizz-buzz --inputs 7 21 105 --genes "Rule { label: 'Bazz', when: DivisibleBy { divisor: 7i } }"</textarea>
+    </label>
+
+    <label class="field">
+      <span>stdin</span>
+      <textarea id="stdin" rows="4" spellcheck="false" placeholder="one line per stdin read (Wordle guesses)"></textarea>
+    </label>
+
+    <div class="actions">
+      <button type="button" id="run">Run</button>
+      <button type="button" id="sample-fizz" class="ghost">FizzBuzz sections</button>
+      <button type="button" id="sample-wordle" class="ghost">Wordle</button>
+    </div>
+
+    <pre id="out" aria-live="polite"></pre>
+  </main>
+  <script type="module" src="./demo.js"></script>
+</body>
+</html>
