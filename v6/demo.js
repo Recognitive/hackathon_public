@@ -1,4 +1,5 @@
 import { runLapis } from "./lapis.js";
+import { splitArgv } from "./argv.js";
 
 const argvEl = document.getElementById("argv");
 const stdinEl = document.getElementById("stdin");
@@ -7,19 +8,6 @@ const runBtn = document.getElementById("run");
 
 const FIZZ_SECTIONS =
   "fizzbuzz :seven divisible-by 7 :bazz rule Bazz @seven : fizz-buzz --inputs 1 3 5 7 15 21 35 105 --genes @bazz";
-
-/** Shell-ish split that keeps double-quoted segments intact. */
-function splitArgv(text) {
-  const out = [];
-  const re = /"([^"\\]*(?:\\.[^"\\]*)*)"|'([^'\\]*(?:\\.[^'\\]*)*)'|(\S+)/g;
-  let m;
-  while ((m = re.exec(text)) !== null) {
-    if (m[1] !== undefined) out.push(m[1].replace(/\\"/g, '"'));
-    else if (m[2] !== undefined) out.push(m[2].replace(/\\'/g, "'"));
-    else out.push(m[3]);
-  }
-  return out;
-}
 
 async function run() {
   const argv = splitArgv(argvEl.value.trim());

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lapis editor</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 1l6 4v6l-6 4-6-4V5z' fill='%230b6e4f'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="./editor.css?v=20261104172207" />
+</head>
+<body>
+  <header class="bar">
+    <h1>Lapis <span>editor</span></h1>
+    <select id="examples" aria-label="Open example"></select>
+    <button type="button" id="reset" class="ghost" title="Restore the example's original files">Reset</button>
+    <span class="spacer"></span>
+    <a class="link" href="../">Demo</a>
+    <button type="button" id="run" title="Run (⌘/Ctrl+Enter)">Run ▸</button>
+  </header>
+
+  <main class="layout">
+    <section class="code" aria-label="Files">
+      <nav id="tabs" class="tabs" role="tablist"></nav>
+      <div id="editor" class="editor"></div>
+      <footer class="status">
+        <span id="index-status" data-kind="busy">loading the host…</span>
+        <span class="hint">Ctrl+Space completes · hover for docs</span>
+      </footer>
+    </section>
+
+    <section class="io" aria-label="Run">
+      <label class="field">
+        <span>Document</span>
+        <select id="entry"></select>
+      </label>
+      <label class="field">
+        <span>Arguments</span>
+        <input id="args" spellcheck="false" autocomplete="off" />
+      </label>
+      <label class="field">
+        <span>Stdin</span>
+        <textarea id="stdin" rows="3" spellcheck="false" placeholder="one line per read"></textarea>
+      </label>
+      <div class="field grow">
+        <span>Output <em id="run-status"></em></span>
+        <pre id="out" aria-live="polite"></pre>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="./editor.js?v=20261104172207"></script>
+</body>
+</html>
