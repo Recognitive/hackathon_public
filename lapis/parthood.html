@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Parthood (beta)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cyan: #00B4F0;
+    --green: #4CB944;
+    --magenta: #ED1556;
+    --magenta-deep: #B0104A;
+    --ink: #0B1220;
+    --ink-2: #1a2332;
+    --muted: #5B6B82;
+    --rule: #E2E8F0;
+    --code-bg: #0B1220;
+    --grad: linear-gradient(90deg, #00B4F0 0%, #4CB944 50%, #ED1556 100%);
+    --grad-v: linear-gradient(180deg, #00B4F0 0%, #4CB944 50%, #ED1556 100%);
+    --font-display: "Outfit", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+    --font-body: "Source Serif 4", "Iowan Old Style", Palatino, Georgia, serif;
+    --font-mono: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
+    --font-ui: "Outfit", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    color: var(--ink-2);
+    font-family: var(--font-body);
+    font-size: 1.05rem;
+    line-height: 1.65;
+    background: #F7F9FD;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative;
+    padding: 4rem 2rem 3rem;
+    text-align: center;
+    background: #fff;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 700px 400px at 15% 20%, rgba(0,180,240,0.12), transparent 70%),
+      radial-gradient(ellipse 700px 400px at 85% 15%, rgba(237,21,86,0.10), transparent 70%),
+      radial-gradient(ellipse 900px 500px at 50% 100%, rgba(76,185,68,0.08), transparent 70%);
+    pointer-events: none;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 4px;
+    background: var(--grad);
+  }
+  .hero-inner {
+    position: relative;
+    z-index: 1;
+    max-width: 760px;
+    margin: 0 auto;
+  }
+  .hero-logo {
+    display: block;
+    width: 100%;
+    max-width: 720px;
+    height: auto;
+    margin: 0 auto 1.25rem;
+  }
+  .hero-tagline {
+    margin: 0;
+    font-family: var(--font-ui);
+    font-size: 0.95rem;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+  .beta-pill {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, var(--magenta), var(--magenta-deep));
+    color: #fff;
+    font-family: var(--font-ui);
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  /* ── LAYOUT ── */
+  .layout {
+    display: grid;
+    grid-template-columns: 16rem minmax(0, 46rem);
+    gap: 3rem;
+    justify-content: center;
+    max-width: 72rem;
+    margin: 0 auto;
+    padding: 3rem 2rem 6rem;
+  }
+
+  /* ── TOC ── */
+  .toc {
+    position: sticky;
+    top: 2rem;
+    align-self: start;
+    max-height: calc(100vh - 4rem);
+    overflow-y: auto;
+    padding-right: 1rem;
+    font-family: var(--font-ui);
+  }
+  .toc-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin: 0 0 1.5rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  .toc-brand .brand-mark {
+    width: 24px;
+    height: 33px;
+    flex-shrink: 0;
+  }
+  .toc-brand .brand-name {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 1.15rem;
+    color: var(--magenta);
+    letter-spacing: -0.02em;
+  }
+  .toc-label {
+    margin: 0 0 0.75rem;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .toc nav { display: flex; flex-direction: column; gap: 0.1rem; }
+  .toc a {
+    display: block;
+    position: relative;
+    padding: 0.35rem 0.65rem 0.35rem 0.85rem;
+    border-radius: 6px;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.85rem;
+    line-height: 1.35;
+    font-weight: 500;
+    transition: color .15s, background .15s;
+  }
+  .toc a:hover { color: var(--magenta); background: rgba(237,21,86,0.05); }
+  .toc a.active {
+    color: var(--ink);
+    background: rgba(237,21,86,0.06);
+    font-weight: 600;
+  }
+  .toc a.active::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 20%; bottom: 20%;
+    width: 3px; border-radius: 2px;
+    background: var(--grad-v);
+  }
+  .toc a.toc-h2 {
+    margin-top: 0.85rem;
+    font-weight: 700;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+  .toc a.toc-h2:first-child { margin-top: 0; }
+  .toc a.toc-h3 { padding-left: 1.35rem; font-size: 0.82rem; }
+
+  /* ── CONTENT ── */
+  .wrap { min-width: 0; }
+
+  .beta-banner {
+    margin: 1.5rem 0 2rem;
+    padding: 1.5rem 1.75rem;
+    background: linear-gradient(135deg, var(--magenta) 0%, var(--magenta-deep) 100%);
+    color: #fff;
+    border-radius: 14px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 12px 40px rgba(237,21,86,0.22), 0 0 0 1px rgba(237,21,86,0.1);
+    font-family: var(--font-ui);
+  }
+  .beta-banner::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--cyan) 0%, var(--green) 55%, var(--magenta) 100%);
+  }
+  .beta-banner .beta-label {
+    display: block;
+    margin: 0 0 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #fff;
+  }
+  .beta-banner p {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.55;
+    color: rgba(255,255,255,0.92);
+  }
+
+  h2 {
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin: 3rem 0 1.25rem;
+    color: var(--ink);
+    position: relative;
+    padding-bottom: 0.6rem;
+    scroll-margin-top: 1.5rem;
+  }
+  h2::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 56px; height: 4px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, var(--cyan), var(--magenta));
+  }
+  h3 {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 2.25rem 0 0.85rem;
+    color: var(--ink);
+    scroll-margin-top: 1.5rem;
+  }
+  p { margin: 0 0 1rem; }
+  a {
+    color: var(--magenta);
+    text-decoration: underline;
+    text-decoration-color: rgba(237,21,86,0.3);
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 3px;
+    font-weight: 500;
+  }
+  a:hover { text-decoration-color: var(--magenta); }
+  ul { margin: 0 0 1.25rem; padding-left: 1.2rem; }
+
+  ul.zen {
+    list-style: none;
+    padding: 0;
+    margin: 1.5rem 0 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+  ul.zen li {
+    position: relative;
+    padding-left: 1.75rem;
+    font-family: var(--font-body);
+    font-size: 1.05rem;
+    line-height: 1.55;
+  }
+  ul.zen li::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0.7rem;
+    width: 16px; height: 6px;
+    border-radius: 2px;
+    background: var(--grad);
+  }
+
+  hr {
+    border: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0,180,240,0.25) 20%, rgba(76,185,68,0.3) 50%, rgba(237,21,86,0.25) 80%, transparent);
+    margin: 2.5rem 0;
+  }
+
+  code {
+    font-family: var(--font-mono);
+    font-size: 0.86em;
+    background: #F1F5FB;
+    padding: 0.12em 0.4em;
+    border-radius: 4px;
+    color: var(--magenta-deep);
+    font-weight: 500;
+  }
+
+  pre {
+    margin: 0 0 1.5rem;
+    padding: 2.25rem 1.5rem 1.5rem;
+    overflow-x: auto;
+    background:
+      var(--grad) top left / 100% 3px no-repeat,
+      var(--code-bg);
+    color: #d7e0ee;
+    border-radius: 14px;
+    position: relative;
+    box-shadow: 0 8px 30px rgba(11,18,32,0.15);
+  }
+  pre code {
+    background: none;
+    padding: 0;
+    font-size: 0.82rem;
+    line-height: 1.6;
+    color: inherit;
+    border-radius: 0;
+    font-weight: 400;
+    white-space: pre;
+  }
+  pre[data-lang]::before {
+    content: attr(data-lang);
+    position: absolute;
+    top: 0.85rem;
+    left: 1.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(126,182,255,0.55);
+  }
+
+  /* Syntax tokens */
+  .k  { color: #7eb6ff; font-weight: 500; }
+  .t  { color: #5ecfc4; }
+  .d  { color: #d4a5ff; }
+  .a  { color: #f0a35e; }
+  .r  { color: #ff8ab8; }
+  .s  { color: #f0c674; }
+  .tp { color: #e8c07d; }
+  .n  { color: #f09878; }
+  .c  { color: #7d8aa3; font-style: italic; }
+  .p  { color: #9aa8bd; }
+  .i  { color: #d7e0ee; }
+
+  table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: 1rem 0 1.5rem;
+    font-family: var(--font-ui);
+    font-size: 0.9rem;
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  thead { background: var(--grad); }
+  th {
+    text-align: left;
+    padding: 0.7rem 0.85rem;
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-family: var(--font-display);
+  }
+  td {
+    text-align: left;
+    padding: 0.65rem 0.85rem;
+    border-top: 1px solid var(--rule);
+    vertical-align: top;
+  }
+  td code { font-size: 0.84em; }
+  strong { font-weight: 700; color: var(--ink); }
+
+  footer {
+    margin-top: 4rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--rule);
+    font-family: var(--font-ui);
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+  footer code { background: transparent; color: var(--muted); padding: 0; }
+
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; gap: 1.5rem; padding: 2rem 1.25rem 4rem; }
+    .toc { position: static; max-height: none; padding: 0 0 1.5rem; border-bottom: 1px solid var(--rule); }
+    .toc nav { flex-direction: row; flex-wrap: wrap; gap: 0.4rem 0.5rem; }
+    .toc a { padding: 0.35rem 0.7rem; background: rgba(237,21,86,0.05); }
+    .toc a.active::before { display: none; }
+    .toc a.active { background: rgba(237,21,86,0.12); }
+    .hero { padding: 2.5rem 1.25rem 2rem; }
+    h2 { font-size: 1.4rem; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <!-- Exact Parthood logo, embedded verbatim from the source SVG. -->
+    <svg class="hero-logo" viewBox="0 0 4342 955" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" role="img" aria-label="Parthood" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+      <path d="M663.688,558.916l0,73.034c0,11.506 -9.327,20.833 -20.833,20.833l-541.667,0c-11.506,0 -20.833,-9.327 -20.833,-20.833l-0,-541.667c-0,-11.505 9.327,-20.833 20.833,-20.833l541.667,0c11.506,0 20.833,9.328 20.833,20.833l0,73.034c0,11.506 -9.327,20.834 -20.833,20.834l-447.8,-0l0,353.932l447.8,0c11.506,0 20.833,9.328 20.833,20.833Z" style="fill:url(#_Linear1);"/>
+      <path d="M663.688,788.778l0,69.328c0,11.506 -9.327,20.833 -20.833,20.833l-541.667,0c-11.506,0 -20.833,-9.327 -20.833,-20.833l-0,-69.328c-0,-11.506 9.327,-20.833 20.833,-20.833l541.667,-0c11.506,-0 20.833,9.327 20.833,20.833Z" style="fill:url(#_Linear2);"/>
+      <g transform="matrix(445.067,0,0,445.067,821.804,863.982)"><path d="M0.134,0.007c-0.017,0 -0.029,-0.004 -0.038,-0.014c-0.009,-0.009 -0.013,-0.022 -0.013,-0.039l-0.001,-0.606c0.001,-0.018 0.005,-0.031 0.014,-0.04c0.01,-0.009 0.022,-0.013 0.039,-0.013l0.239,0c0.076,0 0.135,0.019 0.176,0.057c0.041,0.037 0.062,0.09 0.062,0.158c-0,0.069 -0.021,0.122 -0.062,0.16c-0.041,0.037 -0.1,0.056 -0.176,0.056l-0.188,0l-0,0.228c-0,0.017 -0.005,0.03 -0.013,0.039c-0.009,0.01 -0.022,0.014 -0.039,0.014Zm0.052,-0.364l0.173,0c0.05,0 0.088,-0.011 0.114,-0.033c0.025,-0.023 0.038,-0.056 0.038,-0.1c0,-0.043 -0.013,-0.076 -0.038,-0.098c-0.026,-0.023 -0.064,-0.034 -0.114,-0.034l-0.173,0l-0,0.265Z" style="fill:#ea1543;fill-rule:nonzero;"/></g>
+      <g transform="matrix(445.067,0,0,445.067,1213.28,863.982)"><path d="M0.078,0.007c-0.014,0 -0.024,-0.003 -0.032,-0.009c-0.008,-0.006 -0.013,-0.014 -0.014,-0.024c-0.001,-0.01 0.001,-0.021 0.006,-0.034l0.271,-0.608c0.007,-0.016 0.015,-0.027 0.025,-0.034c0.011,-0.007 0.022,-0.01 0.035,-0.01c0.012,-0 0.023,0.003 0.034,0.01c0.01,0.007 0.018,0.018 0.025,0.034l0.271,0.608c0.006,0.013 0.008,0.024 0.007,0.035c-0.001,0.01 -0.006,0.018 -0.013,0.024c-0.008,0.006 -0.018,0.008 -0.031,0.008c-0.015,0 -0.027,-0.003 -0.035,-0.011c-0.009,-0.007 -0.016,-0.019 -0.023,-0.034l-0.07,-0.162l0.047,0.028l-0.426,-0l0.046,-0.028l-0.069,0.162c-0.007,0.016 -0.014,0.028 -0.022,0.035c-0.008,0.007 -0.019,0.01 -0.032,0.01Zm0.289,-0.597l-0.151,0.358l-0.025,-0.024l0.353,-0l-0.023,0.024l-0.152,-0.358l-0.002,0Z" style="fill:#ea1543;fill-rule:nonzero;"/></g>
+      <g transform="matrix(445.067,0,0,445.067,1678.78,863.982)"><path d="M0.134,0.007c-0.017,0 -0.029,-0.004 -0.038,-0.014c-0.009,-0.009 -0.013,-0.022 -0.013,-0.039l-0.001,-0.606c0.001,-0.018 0.005,-0.031 0.014,-0.04c0.01,-0.009 0.022,-0.013 0.039,-0.013l0.239,0c0.076,0 0.135,0.018 0.176,0.054c0.041,0.036 0.062,0.087 0.062,0.153c-0,0.043 -0.009,0.079 -0.028,0.11c-0.019,0.03 -0.046,0.054 -0.081,0.07c-0.036,0.016 -0.079,0.024 -0.129,0.024l0.009,-0.014l0.026,0c0.027,0 0.05,0.007 0.07,0.02c0.02,0.014 0.037,0.035 0.053,0.064l0.086,0.16c0.007,0.012 0.01,0.023 0.009,0.034c-0,0.011 -0.004,0.02 -0.012,0.027c-0.007,0.007 -0.018,0.01 -0.032,0.01c-0.015,0 -0.026,-0.003 -0.036,-0.009c-0.009,-0.006 -0.017,-0.016 -0.024,-0.029l-0.105,-0.194c-0.014,-0.026 -0.03,-0.044 -0.048,-0.053c-0.018,-0.008 -0.042,-0.013 -0.071,-0.013l-0.113,0l-0,0.245c-0,0.017 -0.005,0.03 -0.013,0.039c-0.009,0.01 -0.022,0.014 -0.039,0.014Zm0.052,-0.376l0.171,-0c0.051,-0 0.089,-0.011 0.115,-0.032c0.026,-0.022 0.039,-0.053 0.039,-0.095c0,-0.042 -0.013,-0.073 -0.039,-0.094c-0.026,-0.021 -0.064,-0.032 -0.115,-0.032l-0.171,0l-0,0.253Z" style="fill:#ea1543;fill-rule:nonzero;"/></g>
+      <g transform="matrix(445.067,0,0,445.067,2109.04,863.982)"><path d="M0.306,0.007c-0.017,0 -0.03,-0.004 -0.038,-0.014c-0.009,-0.009 -0.014,-0.022 -0.014,-0.039l0,-0.572l-0.212,0c-0.014,0 -0.025,-0.004 -0.033,-0.012c-0.008,-0.007 -0.012,-0.018 -0.012,-0.032c-0,-0.014 0.004,-0.025 0.012,-0.032c0.008,-0.007 0.019,-0.011 0.033,-0.011l0.527,0c0.015,0 0.026,0.004 0.034,0.011c0.008,0.007 0.012,0.018 0.012,0.032c-0,0.014 -0.004,0.025 -0.012,0.033c-0.008,0.007 -0.019,0.011 -0.034,0.011l-0.212,0l0,0.572c0,0.017 -0.004,0.03 -0.012,0.039c-0.009,0.01 -0.022,0.014 -0.039,0.014Z" style="fill:#ea1543;fill-rule:nonzero;"/></g>
+      <g transform="matrix(445.067,0,0,445.067,2518.9,863.982)"><path d="M0.134,0.007c-0.017,0 -0.029,-0.004 -0.038,-0.014c-0.009,-0.009 -0.013,-0.022 -0.013,-0.039l-0.001,-0.613c0.001,-0.017 0.005,-0.031 0.014,-0.04c0.009,-0.009 0.021,-0.013 0.038,-0.013c0.017,-0 0.029,0.004 0.038,0.013c0.009,0.009 0.014,0.023 0.014,0.04l-0,0.258l0.395,-0l0,-0.258c0,-0.017 0.004,-0.031 0.013,-0.04c0.009,-0.009 0.022,-0.013 0.039,-0.013c0.016,-0 0.029,0.004 0.038,0.013c0.009,0.009 0.013,0.023 0.013,0.04l0,0.613c0,0.017 -0.004,0.03 -0.013,0.039c-0.009,0.01 -0.022,0.014 -0.038,0.014c-0.017,0 -0.03,-0.004 -0.039,-0.014c-0.009,-0.009 -0.013,-0.022 -0.013,-0.039l0,-0.268l-0.395,0l-0,0.268c-0,0.017 -0.005,0.03 -0.013,0.039c-0.009,0.01 -0.022,0.014 -0.039,0.014Z" style="fill:#ea1543;fill-rule:nonzero;"/></g>
+      <g transform="matrix(445.067,0,0,445.067,2998.07,863.982)"><path d="M0.388,0.009c-0.067,0 -0.125,-0.014 -0.175,-0.044c-0.049,-0.03 -0.087,-0.072 -0.115,-0.126c-0.027,-0.055 -0.04,-0.118 -0.04,-0.192c-0,-0.056 0.007,-0.105 0.023,-0.15c0.015,-0.044 0.037,-0.082 0.066,-0.114c0.029,-0.031 0.064,-0.055 0.104,-0.072c0.041,-0.017 0.086,-0.025 0.137,-0.025c0.067,-0 0.125,0.014 0.175,0.044c0.049,0.029 0.088,0.071 0.115,0.125c0.027,0.054 0.04,0.117 0.04,0.191c0,0.056 -0.008,0.106 -0.023,0.15c-0.016,0.045 -0.038,0.083 -0.067,0.115c-0.028,0.032 -0.063,0.056 -0.104,0.073c-0.04,0.017 -0.086,0.025 -0.136,0.025Zm-0,-0.09c0.047,0 0.087,-0.01 0.12,-0.032c0.033,-0.021 0.058,-0.052 0.075,-0.093c0.018,-0.041 0.027,-0.09 0.027,-0.147c-0,-0.086 -0.019,-0.153 -0.058,-0.2c-0.039,-0.048 -0.093,-0.071 -0.164,-0.071c-0.047,-0 -0.086,0.01 -0.119,0.031c-0.034,0.022 -0.059,0.053 -0.077,0.093c-0.017,0.041 -0.026,0.09 -0.026,0.147c0,0.086 0.019,0.152 0.058,0.2c0.039,0.048 0.094,0.072 0.164,0.072Z" style="fill:#ea1543;fill-rule:nonzero;"/></g>
+      <g transform="matrix(445.067,0,0,445.067,3481.04,863.982)"><path d="M0.388,0.009c-0.067,0 -0.125,-0.014 -0.175,-0.044c-0.049,-0.03 -0.087,-0.072 -0.115,-0.126c-0.027,-0.055 -0.04,-0.118 -0.04,-0.192c-0,-0.056 0.007,-0.105 0.023,-0.15c0.015,-0.044 0.037,-0.082 0.066,-0.114c0.029,-0.031 0.064,-0.055 0.104,-0.072c0.041,-0.017 0.086,-0.025 0.137,-0.025c0.067,-0 0.125,0.014 0.175,0.044c0.049,0.029 0.088,0.071 0.115,0.125c0.027,0.054 0.04,0.117 0.04,0.191c0,0.056 -0.008,0.106 -0.023,0.15c-0.016,0.045 -0.038,0.083 -0.067,0.115c-0.028,0.032 -0.063,0.056 -0.104,0.073c-0.04,0.017 -0.086,0.025 -0.136,0.025Zm-0,-0.09c0.047,0 0.087,-0.01 0.12,-0.032c0.033,-0.021 0.058,-0.052 0.075,-0.093c0.018,-0.041 0.027,-0.09 0.027,-0.147c-0,-0.086 -0.019,-0.153 -0.058,-0.2c-0.039,-0.048 -0.093,-0.071 -0.164,-0.071c-0.047,-0 -0.086,0.01 -0.119,0.031c-0.034,0.022 -0.059,0.053 -0.077,0.093c-0.017,0.041 -0.026,0.09 -0.026,0.147c0,0.086 0.019,0.152 0.058,0.2c0.039,0.048 0.094,0.072 0.164,0.072Z" style="fill:#ea1543;fill-rule:nonzero;"/></g>
+      <g transform="matrix(445.067,0,0,445.067,3964.02,863.982)"><path d="M0.138,-0c-0.018,-0 -0.032,-0.005 -0.041,-0.014c-0.01,-0.01 -0.014,-0.024 -0.014,-0.042l-0.001,-0.593c0.001,-0.018 0.005,-0.032 0.015,-0.042c0.009,-0.009 0.023,-0.014 0.041,-0.014l0.193,0c0.116,0 0.206,0.03 0.269,0.091c0.063,0.06 0.094,0.147 0.094,0.261c0,0.057 -0.008,0.107 -0.024,0.151c-0.016,0.044 -0.039,0.081 -0.07,0.11c-0.031,0.03 -0.069,0.053 -0.114,0.069c-0.045,0.015 -0.096,0.023 -0.155,0.023l-0.193,0Zm0.048,-0.087l0.139,0c0.044,0 0.082,-0.005 0.115,-0.016c0.032,-0.012 0.059,-0.028 0.081,-0.05c0.022,-0.022 0.038,-0.05 0.049,-0.083c0.011,-0.034 0.016,-0.073 0.016,-0.117c-0,-0.089 -0.022,-0.155 -0.065,-0.199c-0.044,-0.044 -0.109,-0.066 -0.196,-0.066l-0.139,-0l-0,0.531Z" style="fill:#ea1543;fill-rule:nonzero;"/></g>
+      <defs>
+        <linearGradient id="_Linear1" x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(738.376,0,0,927.385,338.156,-1915.59)">
+          <stop offset="0" style="stop-color:#00b3ff;stop-opacity:1"/>
+          <stop offset="0.37" style="stop-color:#40c83e;stop-opacity:1"/>
+          <stop offset="0.67" style="stop-color:#c43c42;stop-opacity:1"/>
+          <stop offset="1" style="stop-color:#ed1143;stop-opacity:1"/>
+        </linearGradient>
+        <linearGradient id="_Linear2" x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(541.667,0,0,680.322,101.188,656.6)">
+          <stop offset="0" style="stop-color:#00b3ff;stop-opacity:1"/>
+          <stop offset="0.37" style="stop-color:#40c83e;stop-opacity:1"/>
+          <stop offset="0.67" style="stop-color:#c43c42;stop-opacity:1"/>
+          <stop offset="1" style="stop-color:#ed1143;stop-opacity:1"/>
+        </linearGradient>
+      </defs>
+    </svg>
+    <p class="hero-tagline">
+      Recognitive's modelled language
+      <span class="beta-pill">beta</span>
+    </p>
+  </div>
+</header>
+
+<div class="layout">
+  <aside class="toc" aria-label="Table of contents">
+    <div class="toc-brand">
+      <!-- Cropped glyph-only version of the same logo. Gradient IDs renamed to avoid collision with the hero. -->
+      <svg class="brand-mark" viewBox="80 69 584 810" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+        <defs>
+          <linearGradient id="mk-grad-1" x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(738.376,0,0,927.385,338.156,-1915.59)">
+            <stop offset="0" style="stop-color:#00b3ff;stop-opacity:1"/>
+            <stop offset="0.37" style="stop-color:#40c83e;stop-opacity:1"/>
+            <stop offset="0.67" style="stop-color:#c43c42;stop-opacity:1"/>
+            <stop offset="1" style="stop-color:#ed1143;stop-opacity:1"/>
+          </linearGradient>
+          <linearGradient id="mk-grad-2" x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(541.667,0,0,680.322,101.188,656.6)">
+            <stop offset="0" style="stop-color:#00b3ff;stop-opacity:1"/>
+            <stop offset="0.37" style="stop-color:#40c83e;stop-opacity:1"/>
+            <stop offset="0.67" style="stop-color:#c43c42;stop-opacity:1"/>
+            <stop offset="1" style="stop-color:#ed1143;stop-opacity:1"/>
+          </linearGradient>
+        </defs>
+        <path d="M663.688,558.916l0,73.034c0,11.506 -9.327,20.833 -20.833,20.833l-541.667,0c-11.506,0 -20.833,-9.327 -20.833,-20.833l-0,-541.667c-0,-11.505 9.327,-20.833 20.833,-20.833l541.667,0c11.506,0 20.833,9.328 20.833,20.833l0,73.034c0,11.506 -9.327,20.834 -20.833,20.834l-447.8,-0l0,353.932l447.8,0c11.506,0 20.833,9.328 20.833,20.833Z" style="fill:url(#mk-grad-1);"/>
+        <path d="M663.688,788.778l0,69.328c0,11.506 -9.327,20.833 -20.833,20.833l-541.667,0c-11.506,0 -20.833,-9.327 -20.833,-20.833l-0,-69.328c-0,-11.506 9.327,-20.833 20.833,-20.833l541.667,-0c11.506,-0 20.833,9.327 20.833,20.833Z" style="fill:url(#mk-grad-2);"/>
+      </svg>
+      <span class="brand-name">Parthood</span>
+    </div>
+    <p class="toc-label">Contents</p>
+    <nav id="toc" aria-label="Sections">
+      <a class="toc-h2" href="#foundations">Foundations</a>
+      <a class="toc-h3" href="#why-shapes">Why these shapes</a>
+      <a class="toc-h3" href="#models-world">Models carry the world</a>
+      <a class="toc-h3" href="#info-meaning">Information is not meaning</a>
+      <a class="toc-h2" href="#concepts">Concepts</a>
+      <a class="toc-h3" href="#host">Host</a>
+      <a class="toc-h3" href="#models">Models</a>
+      <a class="toc-h3" href="#entities">Entities &amp; enums</a>
+      <a class="toc-h3" href="#evaluables">Evaluables &amp; experts</a>
+      <a class="toc-h3" href="#lson">LSON documents</a>
+      <a class="toc-h3" href="#types">Type system</a>
+      <a class="toc-h3" href="#metadata">Metadata</a>
+      <a class="toc-h3" href="#refs">~ refs</a>
+      <a class="toc-h3" href="#reflection">Reflection</a>
+      <a class="toc-h3" href="#outcomes">Outcomes</a>
+      <a class="toc-h3" href="#steps">Steps &amp; chaining</a>
+      <a class="toc-h3" href="#cli">CLI as model</a>
+      <a class="toc-h3" href="#control">Control flow</a>
+      <a class="toc-h2" href="#zen">Zen of Parthood</a>
+    </nav>
+  </aside>
+
+  <div class="wrap">
+    <article>
+
+      <aside class="beta-banner" role="status">
+        <span class="beta-label">BETA — EARLY AND INCOMPLETE</span>
+        <p>This is an exploratory sketch of Parthood (v4), not a finished language. Syntax, semantics, the host, and these notes are provisional. Expect gaps, inventions, and breaking changes. Do not treat this as a stable specification or production API.</p>
+      </aside>
+
+      <p>Parthood is Recognitive’s modelled language: data, behaviour, metadata, errors, and reflection share one typed substrate. Grammars express models; models define the language. See the <a href="https://github.com/Recognitive/docs/blob/main/Supersoftware-white-paper.md">Supersoftware white paper</a> and <a href="https://share.note.sx/e2fgkw3b">architectural notes</a>.</p>
+
+      <p>File roles: <code>.prd</code> declares models and experts; <code>.lson</code> carries typed values (LSON / Recognitive Notation).</p>
+
+      <hr>
+
+      <h2 id="foundations">Foundations</h2>
+
+      <h3 id="why-shapes">Why these shapes</h3>
+      <p>Ordinary software scatters meaning across code, configs, schemas, and wire formats that cannot inspect each other. Parthood collapses that into one reflective model so a system can reason about itself and exchange that reasoning intact — <em>exo-homoiconicity</em>, not merely “code is data.”</p>
+      <p><strong>Models define the language; grammars only project it.</strong> Syntax is a disposable surface. Evolve how you write Parthood; the model remains the shared, inspectable contract tools and LLMs can read. That is <em>not</em> “models own meaning”: meaning still depends on who interprets the model (see below). Models carry the distinctions; receivers still do the interpreting.</p>
+      <pre data-lang="prd"><code># Alias/Positional are model data — the CLI parser learns the command line from them
+@Alias {name: 'add'}
+entity AddTask { priority: Priority }</code></pre>
+
+      <p><strong>Denote values before running them.</strong> An invocation is an entity you can store, validate, or ship; an expert supplies behaviour later. The host need not understand the domain.</p>
+      <pre data-lang="prd"><code>entity FizzBuzz: Result { inputs: list&lt;integer&gt; }
+# `fizz-buzz --inputs 1 2` builds this value; evaluation is optional and separate</code></pre>
+
+      <p><strong>Failures are values.</strong> No exceptions: <code>Reason</code> / <code>Failure</code> travel like any other entity, so many independent errors can surface together and stay located.</p>
+      <pre data-lang="prd"><code>expert function wordle(evaluable: Wordle): Maybe&lt;Board&gt; {
+  return InvalidValue { text: "Too many guesses" }  # → Maybe.empty
+}</code></pre>
+
+      <p><strong>Two reflections, one loop.</strong> Modelled reflection (<code>EntityType</code>, …) is exchangeable data; behavioural reflection is the host’s <code>create</code> / <code>get</code> / <code>set</code>. Declarations become data, then deploy into behaviour — so types can also be built from data alone.</p>
+      <pre data-lang="prd"><code>Reflection.deploy(Model { name: 'fixture:ghost', types: set&lt;Type&gt; [ghost] })</code></pre>
+
+      <p><strong>Steps instead of lambdas.</strong> Composition (<code>Apply</code>, <code>Bind</code>, <code>Map</code>) is itself model data, so pipelines stay serialisable and type-checkable.</p>
+      <pre data-lang="prd"><code>return Map(outcome: Check(value: evaluable), next: ClassifyInputs {})</code></pre>
+
+      <p><strong>Keep domains thin.</strong> Parsing, views, and validation live in separate models so a domain declares <em>what</em> without owning the CLI or presentation.</p>
+      <pre data-lang="lson"><code>&lt; RunCommandLine { domains: ['example:wordle'], view: TextView {} }</code></pre>
+
+      <h3 id="models-world">Models carry the world</h3>
+      <p>The distinctions a domain needs — types, metadata, evaluables, reasons, views — live in Parthood models, so they can be reflected, exchanged, and checked without asking the runtime. The host supplies only the <em>machine edge</em>: bytes, clocks, argv, process exit. It must not encode domain vocabulary; if the host knew what a <code>Priority</code> or a <code>Board</code> was, swapping hosts or tooling would fork the world model.</p>
+      <p>Consequences: CLI shape comes from <code>@Alias</code> / <code>@Positional</code>, not from host switches; decode and locate errors in Parthood; presentation is a <code>View</code> step, not <code>println</code> in the bootstrap. The host’s job is to bind externals, deploy reflection, evaluate whatever the document emits, and print the lines a view returns.</p>
+      <pre data-lang="prd"><code># The model carries what "add high" denotes
+@Alias {name: 'add'}
+entity AddTask { priority: Priority = Priority.medium }
+
+# Edge: the host only injects argv and writes the view's strings
+# &lt; RunCommandLine { args: $args, domains: ['example:tasks'] }</code></pre>
+
+      <h3 id="info-meaning">Information is not meaning</h3>
+      <p><a href="https://en.wikipedia.org/wiki/A_Mathematical_Theory_of_Communication">Shannon’s model</a> accounts for <em>information</em>: a signal selected from a set of possible signals, sent through a channel, recovered at a receiver. It is silent on <em>meaning</em>. A bit string can arrive intact and still mean nothing — or mean different things — depending on who receives it and in what shared world they stand.</p>
+      <p>Meaning is subjective and bound to interpretation. It depends on context and on the receiver’s models: prior types, vocabulary, purposes, and the distinctions they know how to draw. The same tokens <code>high</code> or <code>Board { won: true }</code> are only significant once a participant can place them in a type, a domain, a use.</p>
+      <p>Parthood does not encode a universal semantics. It facilitates interpretation: a shared, reflective substrate so senders and receivers can align (or deliberately diverge) their models — <code>%model</code>, typed values, metadata, reasons — and make that alignment itself inspectable. Exo-intelligence needs channels <em>and</em> legible context; Parthood is the latter.</p>
+      <pre data-lang="lson"><code>%model example:tasks#[0.1,0.2)
+# Channel delivers text; meaning starts when the receiver's model binds it
+&lt; AddTask { priority: high }</code></pre>
+
+      <hr>
+
+      <h2 id="concepts">Concepts</h2>
+
+      <h3 id="host">Host</h3>
+      <p>The <strong>host</strong> is the runtime process that loads Parthood and performs what models cannot: read files and argv, deploy behavioural reflection (<code>create</code>, <code>get</code>/<code>set</code>, <code>parse</code>), bind <code>$name</code> externals, evaluate experts, and write stdout/stderr. Models carry the world; the host owns the machine edge. In v4 that host is the Rust bootstrap (<code>./parthood</code>). It stays domain-blind — a command is just an emitted evaluable plus a view.</p>
+      <pre data-lang="lson"><code>%lson 0.1
+%model hackathon:cli-run#[0.1,0.2)
+
+# $args is supplied by the host; everything else is Parthood
+&lt; RunCommandLine { args: $args, domains: ['example:tasks'] }</code></pre>
+
+      <h3 id="models">Models</h3>
+      <p>A named package of types. <code>%model</code> pulls a dependency; <code>id</code> is how domains are addressed.</p>
+      <pre data-lang="prd"><code>%model hackathon:cli-metadata#[0.1,0.2)
+
+model Tasks @lson {
+  id: 'example:tasks',
+  stability: 'evolving'
+} {
+  enum Priority { low, medium, high }
+  entity AddTask {
+    priority: Priority = Priority.medium
+  }
+}</code></pre>
+
+      <h3 id="entities">Entities &amp; enums</h3>
+      <p>Entities are identity-bearing records. Enums are model-defined scalars. Inheritance uses <code>extends</code>.</p>
+      <pre data-lang="prd"><code>abstract entity Condition extends Step: boolean {
+  input: integer
+}
+
+entity DivisibleBy extends Condition: boolean {
+  divisor: integer
+}</code></pre>
+
+      <h3 id="evaluables">Evaluables &amp; experts</h3>
+      <p><code>entity Name: T</code> means the entity <em>evaluates to</em> <code>T</code>. An <code>expert function</code> binds behaviour to that type. Evaluation is data-first: build the value, then run it.</p>
+      <pre data-lang="prd"><code>entity ScoreGuess: ScoredGuess {
+  secret: string
+  guess: string
+}
+
+expert function scoreGuess(evaluable: ScoreGuess): ScoredGuess {
+  return ScoredGuess { guess: evaluable.guess, tiles: list&lt;Tile&gt; [] }
+}</code></pre>
+      <p>Call as <code>ScoreGuess(secret: s, guess: g)</code> or <code>step()</code>.</p>
+
+      <h3 id="lson">LSON documents</h3>
+      <p>Preamble declares version and models. Bindings pool values; <code>&lt; value</code> emits. <code>$name</code> is a host binding.</p>
+      <pre data-lang="lson"><code>%lson 0.1
+%model hackathon:cli-run#[0.1,0.2)
+
+&lt; RunCommandLine {
+  args: $args,
+  domains: ['example:wordle'],
+  view: TextView {}
+}</code></pre>
+
+      <h3 id="types">Type system</h3>
+      <p>Scalars (<code>boolean</code>, <code>string</code>, <code>integer</code>, …), collections (<code>list&lt;T&gt;</code>, <code>set&lt;T&gt;</code>, <code>map&lt;K,V&gt;</code>), <code>typeref&lt;T&gt;</code>, and unions. Model generics stay reduced to those four forms.</p>
+      <pre data-lang="prd"><code>type Option = Some | None
+type Result = Some | Failure
+
+entity FizzBuzz: Result {
+  inputs: list&lt;integer&gt;
+  rules: list&lt;Rule&gt; = list&lt;Rule&gt; [
+    Rule { label: 'Fizz', when: DivisibleBy { divisor: 3 } }
+  ]
+}</code></pre>
+
+      <h3 id="metadata">Metadata</h3>
+      <p><code>@Type { … }</code> before a declaration is a <code>MetaData</code> entity. Cascading resolution picks what applies (element → property type → supertypes), filtered by selectors.</p>
+      <pre data-lang="prd"><code>@Positional {properties: [~AddTask.priority]}
+@Alias {name: 'add'}
+entity AddTask {
+  @Alias {name: 'prio'}
+  priority: Priority = Priority.medium
+}</code></pre>
+
+      <h3 id="refs">~ refs</h3>
+      <p><code>~Type.property</code> is a <strong>load-time</strong> reference into the modelled meta-model. Where the expected type is <code>Property</code> (as in <code>Positional.properties</code>), it resolves to that <code>Property</code> entity. Elsewhere it yields a <em>locus</em> (a typed location). A wrong name fails the load — metadata cannot silently point at nothing.</p>
+      <pre data-lang="prd"><code># Resolves to the Property instance for AddTask.priority
+@Positional {properties: [~AddTask.priority]}
+
+entity DivisibleBy extends Condition: boolean {
+  @Minimum {value: 1}   # metadata on the property; ~ not needed here
+  divisor: integer
+}</code></pre>
+      <p>Contrast: <code>$args</code> is a host binding at run time; <code>?FileResource</code> is behavioural reflection. Only <code>~</code> is checked against declarations before any argv is read.</p>
+
+      <h3 id="reflection">Reflection (the strange loop)</h3>
+      <table>
+        <thead>
+          <tr><th>Side</th><th>What</th><th>Reach</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Modelled</td><td><code>EntityType</code>, <code>Property</code>, <code>Model</code> as data</td><td><code>Models.find</code>, <code>.manifest()</code></td></tr>
+          <tr><td>Behavioural</td><td>Host deploy: <code>create</code>, <code>get</code>/<code>set</code>, <code>parse</code></td><td><code>Reflection</code>, <code>?Name</code></td></tr>
+        </tbody>
+      </table>
+      <p>Declaration → modelled instance → deploy → behavioural type. Types can be built from data alone.</p>
+      <pre data-lang="prd"><code>let ghost = EntityType { typeSignature: 'Ghost' }
+ghost.properties.add(Property {
+  name: 'label', type: text.manifest(), declaringType: ghost
+})
+Reflection.deploy(Model { name: 'fixture:ghost', types: set&lt;Type&gt; [ghost] })</code></pre>
+
+      <h3 id="outcomes">Outcomes</h3>
+      <p>No exceptions. <code>Option</code> is presence; <code>Result</code>/<code>Maybe</code> is success-or-reasons. Returning a <code>Reason</code> from a <code>Maybe</code>-typed expert is failure.</p>
+      <pre data-lang="prd"><code>expert function wordle(evaluable: Wordle): Maybe&lt;Board&gt; {
+  if (evaluable.guesses.size &gt; 5) {
+    return InvalidValue { text: "Too many guesses" }
+  }
+  return Board { rows: rows, won: won }
+}</code></pre>
+      <pre data-lang="prd"><code>match parsed {
+  Failure as failed { /* use failed.reasons */ }
+  Some as ok { /* use ok.value */ }
+}</code></pre>
+
+      <h3 id="steps">Steps &amp; chaining</h3>
+      <p><code>Step</code> is a partial evaluable (input filled later). <code>Apply</code> / <code>Bind</code> / <code>Map</code> compose without lambdas.</p>
+      <pre data-lang="prd"><code>expert function fizzBuzz(evaluable: FizzBuzz): Result {
+  return Map(outcome: Check(value: evaluable), next: ClassifyInputs {})
+}
+
+expert function divisibleBy(evaluable: DivisibleBy): boolean {
+  return evaluable.input % evaluable.divisor == 0
+}
+# Apply(step: rule.when, input: number) fills Condition.input, then evaluates</code></pre>
+
+      <h3 id="cli">CLI as model</h3>
+      <p>Argv denotes entities. Metadata (<code>Positional</code>, <code>Alias</code>) shapes the command line; the host only binds <code>$args</code> and prints the view.</p>
+      <pre data-lang="text"><code>./parthood tasks add high
+# → AddTask { priority: Priority.high }</code></pre>
+      <pre data-lang="prd"><code>entity RunCommandLine: CommandResult {
+  args: list&lt;string&gt;
+  domains: list&lt;string&gt;
+  evaluator: CliEvaluator
+  view: Step
+}</code></pre>
+
+      <h3 id="control">Control flow (sketch)</h3>
+      <p><code>let</code>, <code>if</code>, <code>for</code>/<code>while</code>, <code>match</code>, property mutation, string interpolation. Checked at load where possible (expert signatures, <code>match</code> exhaustiveness, <code>~</code> refs).</p>
+      <pre data-lang="prd"><code>for guess in evaluable.guesses {
+  let scored = ScoreGuess(secret: secret, guess: guess)
+  rows.add(scored)
+}
+return "${row.guess} ${marks}"</code></pre>
+
+      <hr>
+
+      <h2 id="zen">Zen of Parthood</h2>
+      <ul class="zen">
+        <li>Beautiful is better than clever — when the model can say it.</li>
+        <li>Models define the language; grammars only wear it.</li>
+        <li>The host moves bytes; the model carries the world.</li>
+        <li>Information arrives; meaning is interpreted.</li>
+        <li>Denote first. Evaluate when you must.</li>
+        <li>A value you can ship beats a call you cannot name.</li>
+        <li>Failure is a value. Silence is not an error report.</li>
+        <li>Steps compose; closures hide.</li>
+        <li>Metadata is data. Reflection is ordinary.</li>
+        <li>Two mirrors, one loop: declare, deploy, become.</li>
+        <li>Thin domains. Fat hosts are a smell.</li>
+        <li><code>~</code> fails at load. Wishful metadata does not.</li>
+        <li>Prefer one substrate to many formats that cannot see each other.</li>
+        <li>Explicit models beat implicit convention — except when the model <em>is</em> the convention.</li>
+        <li>There should be one obvious place for a distinction — in a model someone else can read.</li>
+        <li>Namespaces are cheap. Forked world-models are not.</li>
+        <li>If the LLM cannot inspect it, you will explain it forever.</li>
+        <li>Provisional is fine. Pretending it is finished is not.</li>
+      </ul>
+
+    </article>
+    <footer>Rendered from <code>PARTHOOD.md</code> · Parthood syntax highlight</footer>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var KEYWORDS = { model:1, entity:1, enum:1, expert:1, function:1, abstract:1, extends:1,
+    type:1, let:1, if:1, for:1, while:1, match:1, return:1, in:1, as:1, true:1, false:1, null:1 };
+  var TYPES = { boolean:1, string:1, integer:1, long:1, decimal:1, float:1, double:1,
+    date:1, list:1, set:1, map:1, typeref:1, Base:1, Maybe:1, Option:1, Result:1 };
+
+  function esc(s) {
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+  function tok(cls, text) {
+    return '<span class="' + cls + '">' + esc(text) + '</span>';
+  }
+  function highlight(src) {
+    var out = '', i = 0, n = src.length, lineStart = true;
+    while (i < n) {
+      var c = src[i];
+      if (c === '\n') { out += '\n'; i++; lineStart = true; continue; }
+      if (c === ' ' || c === '\t' || c === '\r') { out += c; i++; continue; }
+      if (c === '#') {
+        var cs = i;
+        while (i < n && src[i] !== '\n') i++;
+        out += tok('c', src.slice(cs, i));
+        continue;
+      }
+      if (c === '%' && lineStart) {
+        var ds = i;
+        while (i < n && src[i] !== '\n') i++;
+        out += tok('d', src.slice(ds, i));
+        continue;
+      }
+      lineStart = false;
+      if (c === '@' && /[A-Za-z_]/.test(src[i+1] || '')) {
+        var as = i; i++;
+        while (i < n && /[A-Za-z0-9_]/.test(src[i])) i++;
+        out += tok('a', src.slice(as, i));
+        continue;
+      }
+      if ((c === '~' || c === '$' || c === '?') && /[A-Za-z_]/.test(src[i+1] || '')) {
+        var rs = i; i++;
+        while (i < n && /[A-Za-z0-9_.]/.test(src[i])) i++;
+        out += tok('r', src.slice(rs, i));
+        continue;
+      }
+      if (c === '"' || c === "'") {
+        var q = c, ss = i; i++;
+        while (i < n) {
+          if (src[i] === '\\') { i += 2; continue; }
+          if (src[i] === q) { i++; break; }
+          if (src[i] === '\n' && q === "'") break;
+          i++;
+        }
+        out += tok(q === '"' ? 'tp' : 's', src.slice(ss, Math.min(i, n)));
+        continue;
+      }
+      if (/[0-9]/.test(c)) {
+        var ns = i;
+        while (i < n && /[0-9]/.test(src[i])) i++;
+        if (src[i] === '.' && /[0-9]/.test(src[i+1] || '')) {
+          i++;
+          while (i < n && /[0-9]/.test(src[i])) i++;
+        }
+        while (i < n && /[A-Za-z]/.test(src[i])) i++;
+        out += tok('n', src.slice(ns, i));
+        continue;
+      }
+      if (/[A-Za-z_]/.test(c)) {
+        var is = i;
+        while (i < n && /[A-Za-z0-9_]/.test(src[i])) i++;
+        var id = src.slice(is, i);
+        out += tok(KEYWORDS[id] ? 'k' : TYPES[id] ? 't' : 'i', id);
+        continue;
+      }
+      var two = src.slice(i, i+2);
+      if (two === '==' || two === '!=' || two === '<=' || two === '>=' || two === '&&' || two === '||') {
+        out += tok('p', two); i += 2; continue;
+      }
+      out += tok('p', c);
+      i++;
+    }
+    return out;
+  }
+
+  var blocks = document.querySelectorAll('pre[data-lang] > code');
+  for (var b = 0; b < blocks.length; b++) {
+    try {
+      var raw = blocks[b].textContent;
+      blocks[b].innerHTML = highlight(raw);
+    } catch (e) { /* leave plain */ }
+  }
+
+  var links = document.querySelectorAll('#toc a');
+  if (!links.length || !('IntersectionObserver' in window)) return;
+  var map = {};
+  for (var l = 0; l < links.length; l++) map[links[l].getAttribute('href').slice(1)] = links[l];
+  function setActive(id) {
+    for (var k in map) map[k].classList.toggle('active', k === id);
+  }
+  var obs = new IntersectionObserver(function (entries) {
+    var visible = entries.filter(function (e) { return e.isIntersecting; })
+      .sort(function (a, b) { return a.boundingClientRect.top - b.boundingClientRect.top; });
+    if (visible.length) setActive(visible[0].target.id);
+  }, { rootMargin: '-10% 0px -70% 0px', threshold: [0, 1] });
+  for (var m = 0; m < links.length; m++) {
+    var target = document.getElementById(links[m].getAttribute('href').slice(1));
+    if (target) obs.observe(target);
+  }
+})();
+</script>
+</body>
+</html>
