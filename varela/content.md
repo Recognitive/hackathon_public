@@ -7,41 +7,40 @@
 
 ## Introduction
 
-Varela is a modelled language: data, behaviour, metadata, errors, and reflection share one typed substrate. In the language, homoiconicity is more expansive than LISP-like 'code is data'. It means a unified symbolic model substrate represents data, code, metadata, reflection, configuration, errors, deployments, dependencies, evaluables, and models themselves. The 'code is data' idea is included, but the broader principle is that everything is a model. And models modify models.
+Varela is a modelled language in which data, behaviour, metadata, errors, and reflection share one typed substrate. Here, homoiconicity goes beyond Lisp’s *“code is data”*: a single symbolic model represents data, code, metadata, reflection, configuration, errors, deployments, dependencies, evaluables, and models themselves. Everything is a model, and models modify models.
 
-Accordingly, all language aspects are defined by models not by grammars. Varela offers the models and their data as core substrate but it also defines itself with that substrate to stay highly reflected and normalised on its language level (no xml, json, yaml, properties, ini, make, etc.).
+Accordingly, all language aspects are defined by models, not by grammars. We refer to software expressed in Varela as **supersoftware**: software that is itself symbolic AI. Because the language is itself modelled, Varela constitutes supersoftware — staying self-describing and normalised at the language level without falling back on XML, JSON, YAML, `.properties`, INI, or Make.
 
-There are two grammars to express the models and their data generically:
+When a domain system such as a CRM system is expressed in Varela, there is only **one** supersoftware and **one** substrate in play, not two layers stacked apart:
 
-- Varela Exchange for data
-- Model Grammar to describe any model including the meta-model — the natural representation of the model grammar.
+- **One supersoftware:** Because Varela is self-modelled, the core models that define the language (`EntityType`, `Property`, `Model`, `Step`, `Reason`) and the domain models that define the CRM (`Customer`, `Deal`, `Pipeline`) inhabit the exact same meta-model. A CRM system expressed in Varela is not an application running on top of a language; it is an extension of the same living model graph. Extending Varela with CRM types is the exact same structural operation as Varela defining its own built-in types.
+- **One substrate:** In biology, a cell’s metabolic machinery and the tissues built from those cells do not run on two different physical substrates—they are the same biochemical substrate organised at different levels of differentiation. Likewise, the language’s own models and the CRM’s models share one continuous, reflective medium. A single `Reflection` query, a single `.xvla` serialiser, and a single structural verifier traverse both language constructs and CRM entities without crossing a seam.
 
-And there are two reflection worlds:
+Two generic grammars project those models and their data:
 
-- Endo-homoiconicity and reflection: internal, informal and functional
-- Exo-homoiconicity and reflection: generic models that can leave the process space in various forms mapped by domain agnostic algorithms (e.g. serialise, marshall).
+- **Varela Exchange** (`xvla`) for behaviour-free data
+- **Model Grammar** (`mvla`) for any model, including the meta-model—the natural representation of the model grammar itself
 
-Modelling the language means that information about the language aspects can be transported as normal exo-data (eg. with Varela Exchange, but also JSON, YAML). We can use the transfer of model data to reflect about the system.
+Together with expert behaviour, these form three strictly nested media types (`XVLA ⊂ MVLA ⊂ VLA`):
 
-As the language is defined by the model and not the grammar, you can always parse the old grammar to the new model. As other grammars — such as the language native grammar — are built on grammar definitions that bind to the actual language models, the grammar / model relationship is a first class principle.
+- `.xvla` (`application/xvla`): behaviour-free data e**x**change
+- `.mvla` (`application/mvla`): declarative **m**odel definitions
+- `.vla` (`application/vla`): the full **V**are**la** programming language
 
-### Media types
+Reflection spans two complementary modes:
 
-- `.vla` → application/vla: the full **V**are**la** programming language
+- **Endo-homoiconicity and reflection:** internal, in-process, and functional
+- **Exo-homoiconicity and reflection:** generic models serialised and marshalled across process boundaries by domain-agnostic algorithms
 
-- `.mvla` → application/mvla: the declarative **m**odel definitions
-
-- `.xvla` → application/xvla: the behaviour-free data e**x**change
-
-The formats are strictly nested: XVLA ⊂ MVLA ⊂ VLA
+Because the language is defined by its models rather than a fixed syntax, model data can be transported as ordinary exo-data (in Varela Exchange, or mapped to JSON and YAML) so external tools and systems can inspect and reason on the system directly. Older grammars can always be parsed into newer models, and alternative surface grammars—including Varela’s native syntax—bind directly to the underlying language models as a first-class principle.
 
 ## Foundations
 
 ### Why these shapes
 
-Ordinary software scatters meaning across code, configs, schemas, and wire formats that cannot inspect each other. Varela collapses that into one reflective model so a system can reason about itself and exchange that reasoning intact — homoiconicity as a strict structural isomorphism across the full representational substrate, not merely 'code is data'.
+Ordinary software scatters meaning across code, configs, schemas, and wire formats that cannot inspect each other. Varela collapses those silos into one reflective model—maintaining strict structural isomorphism across its entire representational layer so a system can reason about itself and exchange that reasoning intact.
 
-**Models define the language. Grammars project it.** Syntax is a disposable surface. The model remains the shared, inspectable contract tools and LLMs can read. It's *not* 'models own meaning': meaning still depends on who interprets the model in their contexts (see below). Models carry the distinctions.
+**Models define the language; grammars project it.** Syntax is a disposable surface. The model remains the shared, inspectable contract that tools and LLMs can read. That does not mean models *own* meaning: meaning still depends on who interprets the model in their context (see below). Models carry the distinctions; receivers do the interpreting.
 
 ```vla
 # Alias/Positional are model data — the CLI parser learns the command line from them
@@ -248,7 +247,7 @@ Declaration → modelled instance → deploy → behavioural type. Types can be 
 ```vla
 let ghost = EntityType { typeSignature: 'Ghost' }
 ghost.properties.add(Property {
-  name: 'label', type: text.manifest(), declaringType: ghost
+  name: 'label', type: string.manifest(), declaringType: ghost
 })
 Reflection.deploy(Model { name: 'fixture:ghost', types: set<Type> [ghost] })
 ```
@@ -320,7 +319,7 @@ return "${row.guess} ${marks}"
 
 ## Zen of Varela
 
-- Embrace the strange loop
+- Embrace the strange loop.
 - Beautiful is better than clever — when the model can say it.
 - Models define the language; grammars only wear it.
 - Information arrives; meaning is interpreted.
