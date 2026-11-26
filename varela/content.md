@@ -4,19 +4,44 @@
 >
 > This is an exploratory sketch of Varela (v4), not a finished language. Syntax, semantics, the host, and these notes are provisional. Expect gaps, inventions, and breaking changes. Do not treat this as a stable specification or production API.
 
-Varela is a modelled language: data, behaviour, metadata, errors, and reflection share one typed substrate. Grammars express models; models define the language. See the [Supersoftware white paper](https://github.com/Recognitive/docs/blob/main/Supersoftware-white-paper.md) and [architectural notes](https://share.note.sx/e2fgkw3b).
 
-File roles: `.vla` declares models and experts; `.vson` carries typed values (VSON / Varela Notation).
+## Introduction
 
----
+Varela is a modelled language: data, behaviour, metadata, errors, and reflection share one typed substrate. In the language, homoiconicity is more expansive than LISP-like 'code is data'. It means a unified symbolic model substrate represents data, code, metadata, reflection, configuration, errors, deployments, dependencies, evaluables, and models themselves. The 'code is data' idea is included, but the broader principle is that everything is a model. And models modify models.
+
+Accordingly, all language aspects are defined by models not by grammars. Varela offers the models and their data as core substrate but it also defines itself with that substrate to stay highly reflected and normalised on its language level (no xml, json, yaml, properties, ini, make, etc.).
+
+There are two grammars to express the models and their data generically:
+
+- Varela Exchange for data
+- Model Grammar to describe any model including the meta-model — the natural representation of the model grammar.
+
+And there are two reflection worlds:
+
+- Endo-homoiconicity and reflection: internal, informal and functional
+- Exo-homoiconicity and reflection: generic models that can leave the process space in various forms mapped by domain agnostic algorithms (e.g. serialise, marshall).
+
+Modelling the language means that information about the language aspects can be transported as normal exo-data (eg. with Varela Exchange, but also JSON, YAML). We can use the transfer of model data to reflect about the system.
+
+As the language is defined by the model and not the grammar, you can always parse the old grammar to the new model. As other grammars — such as the language native grammar — are built on grammar definitions that bind to the actual language models, the grammar / model relationship is a first class principle.
+
+### Media types
+
+- `.vla` → application/vla: the full **V**are**la** programming language
+
+- `.mvla` → application/mvla: the declarative **m**odel definitions
+
+- `.xvla` → application/xvla: the behaviour-free data e**x**change
+
+The formats are strictly nested: XVLA ⊂ MVLA ⊂ VLA
 
 ## Foundations
 
 ### Why these shapes
 
-Ordinary software scatters meaning across code, configs, schemas, and wire formats that cannot inspect each other. Varela collapses that into one reflective model so a system can reason about itself and exchange that reasoning intact — *exo-homoiconicity*, not merely “code is data.”
+Ordinary software scatters meaning across code, configs, schemas, and wire formats that cannot inspect each other. Varela collapses that into one reflective model so a system can reason about itself and exchange that reasoning intact — homoiconicity as a strict structural isomorphism across the full representational substrate, not merely 'code is data'.
 
-**Models define the language; grammars only project it.** Syntax is a disposable surface. Evolve how you write Varela; the model remains the shared, inspectable contract tools and LLMs can read. That is *not* “models own meaning”: meaning still depends on who interprets the model (see below). Models carry the distinctions; receivers still do the interpreting.
+**Models define the language. Grammars project it.** Syntax is a disposable surface. The model remains the shared, inspectable contract tools and LLMs can read. It's *not* 'models own meaning': meaning still depends on who interprets the model in their contexts (see below). Models carry the distinctions.
 
 ```vla
 # Alias/Positional are model data — the CLI parser learns the command line from them
@@ -74,19 +99,18 @@ entity AddTask { priority: Priority = Priority.medium }
 
 ### Information is not meaning
 
-[Shannon’s model](https://en.wikipedia.org/wiki/A_Mathematical_Theory_of_Communication) accounts for *information*: a signal selected from a set of possible signals, sent through a channel, recovered at a receiver. It is silent on *meaning*. A bit string can arrive intact and still mean nothing — or mean different things — depending on who receives it and in what shared world they stand.
 
-Meaning is subjective and bound to interpretation. It depends on context and on the receiver’s models: prior types, vocabulary, purposes, and the distinctions they know how to draw. The same tokens `high` or `Board { won: true }` are only significant once a participant can place them in a type, a domain, a use.
+[Shannon’s model](https://en.wikipedia.org/wiki/A_Mathematical_Theory_of_Communication) accounts for the transmission of information: a signal selected from a set of possible signals, sent through a channel, recovered at a receiver. It is silent on meaning. A bit string can arrive intact and still mean nothing — or mean different things — depending on who receives it and in what shared world they stand.
 
-Varela does not encode a universal semantics. It facilitates interpretation: a shared, reflective substrate so senders and receivers can align (or deliberately diverge) their models — `%model`, typed values, metadata, reasons — and make that alignment itself inspectable. Exo-intelligence needs channels *and* legible context; Varela is the latter.
+[Donald MacKay](https://en.wikipedia.org/wiki/Donald_MacCrimmon_MacKay) supplied the missing half: while Shannon measured the work a signal does in selecting one message from a set of possibilities, MacKay defined meaning as the work a signal does on the receiver’s *conditional readiness* to think, update its understanding, and act. Meaning is inherently relational, not a property carried inside the message. In natural systems, from cellular signalling to nervous systems, a cue only acquires significance through the receiving organism’s internal state and history of structural coupling; shared meaning emerges only when sender and receiver inhabit a sufficiently aligned context. In the same way, tokens like `high` or `Board { won: true }` depend on the receiver’s models — prior types, vocabulary, purposes, and the distinctions they know how to draw.
+
+Varela does not encode a universal semantics. It facilitates interpretation: a shared, reflective substrate so that senders and receivers can align (or deliberately diverge) their models — `%model`, typed values, metadata, reasons — and make that relational alignment itself inspectable. Exo-intelligence needs channels and legible context; Varela is the latter.
 
 ```xvla
 %model example:tasks#[0.1,0.2)
 # Channel delivers text; meaning starts when the receiver's model binds it
 < AddTask { priority: high }
 ```
-
----
 
 ## Concepts
 
@@ -95,14 +119,12 @@ Varela does not encode a universal semantics. It facilitates interpretation: a s
 The **host** is the runtime process that loads Varela and performs what models cannot: read files and argv, deploy behavioural reflection (`create`, `get`/`set`, `parse`), bind `$name` externals, evaluate experts, and write stdout/stderr. Models carry the world; the host owns the machine edge. In v4 that host is the Rust bootstrap (`./varela`). It stays domain-blind — a command is just an emitted evaluable plus a view.
 
 ```xvla
-%vson 0.1
+%xvla 0.1
 %model hackathon:cli-run#[0.1,0.2)
 
 # $args is supplied by the host; everything else is Varela
 < RunCommandLine { args: $args, domains: ['example:tasks'] }
 ```
-
----
 
 ### Models
 
@@ -111,7 +133,7 @@ A named package of types. `%model` pulls a dependency; `id` is how domains are a
 ```vla
 %model hackathon:cli-metadata#[0.1,0.2)
 
-model Tasks @vson {
+model Tasks @xvla {
   id: 'example:tasks',
   stability: 'evolving'
 } {
@@ -121,8 +143,6 @@ model Tasks @vson {
   }
 }
 ```
-
----
 
 ### Entities & enums
 
@@ -137,8 +157,6 @@ entity DivisibleBy extends Condition: boolean {
   divisor: integer
 }
 ```
-
----
 
 ### Evaluables & experts
 
@@ -157,14 +175,12 @@ expert function scoreGuess(evaluable: ScoreGuess): ScoredGuess {
 
 Call as `ScoreGuess(secret: s, guess: g)` or `step()`.
 
----
-
 ### XVLA documents
 
 Preamble declares version and models. Bindings pool values; `< value` emits. `$name` is a host binding.
 
 ```xvla
-%vson 0.1
+%xvla 0.1
 %model hackathon:cli-run#[0.1,0.2)
 
 < RunCommandLine {
@@ -173,8 +189,6 @@ Preamble declares version and models. Bindings pool values; `< value` emits. `$n
   view: TextView {}
 }
 ```
-
----
 
 ### Type system
 
@@ -192,8 +206,6 @@ entity FizzBuzz: Result {
 }
 ```
 
----
-
 ### Metadata
 
 `@Type { … }` before a declaration is a `MetaData` entity. Cascading resolution picks what applies (element → property type → supertypes), filtered by selectors.
@@ -206,8 +218,6 @@ entity AddTask {
   priority: Priority = Priority.medium
 }
 ```
-
----
 
 ### ~ refs
 
@@ -225,7 +235,6 @@ entity DivisibleBy extends Condition: boolean {
 
 Contrast: `$args` is a host binding at run time; `?FileResource` is behavioural reflection. Only `~` is checked against declarations before any argv is read.
 
----
 
 ### Reflection (the strange loop)
 
@@ -243,8 +252,6 @@ ghost.properties.add(Property {
 })
 Reflection.deploy(Model { name: 'fixture:ghost', types: set<Type> [ghost] })
 ```
-
----
 
 ### Outcomes
 
@@ -266,8 +273,6 @@ match parsed {
 }
 ```
 
----
-
 ### Steps & chaining
 
 `Step` is a partial evaluable (input filled later). `Apply` / `Bind` / `Map` compose without lambdas.
@@ -282,8 +287,6 @@ expert function divisibleBy(evaluable: DivisibleBy): boolean {
 }
 # Apply(step: rule.when, input: number) fills Condition.input, then evaluates
 ```
-
----
 
 ### CLI as model
 
@@ -303,8 +306,6 @@ entity RunCommandLine: CommandResult {
 }
 ```
 
----
-
 ### Control flow (sketch)
 
 `let`, `if`, `for`/`while`, `match`, property mutation, string interpolation. Checked at load where possible (expert signatures, `match` exhaustiveness, `~` refs).
@@ -317,10 +318,9 @@ for guess in evaluable.guesses {
 return "${row.guess} ${marks}"
 ```
 
----
-
 ## Zen of Varela
 
+- Embrace the strange loop
 - Beautiful is better than clever — when the model can say it.
 - Models define the language; grammars only wear it.
 - Information arrives; meaning is interpreted.
