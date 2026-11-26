@@ -165,3 +165,9 @@ strong { font-weight: 700; }
 }
 footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--rule); font-family: var(--font-ui); font-size: .8rem; color: var(--muted); }
 :focus-visible { outline: 2px solid var(--teal); outline-offset: 3px; }
+
+/* Ensure text wraps inside code blocks */
+pre, pre code {
+  white-space: pre-wrap;      /* Preserves spaces, but wraps text at boundaries */
+  word-break: break-word;     /* Forces long unbroken strings (like URLs) to break */
+}
